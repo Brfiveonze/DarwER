@@ -11,17 +11,21 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 public class Toolbox extends JPanel{
-    private MainWin mainWin;
+    private MainWin mainwin;
     private String pic_path;
+    private String[] icon_name;
     private JButton entity = new JButton();
     private JButton attributes = new JButton();
     private JButton relationship = new JButton();
+    private JButton line = new JButton("line");
     private Tab_Panel tab_Panel;
-    Toolbox(MainWin mainWin){
+    Toolbox(MainWin mainwin){
         super();
-        this.mainWin =mainWin;
-        pic_path = mainWin.data_class.get_Img_path();
-        tab_Panel = mainWin.draw_panel.tab_draw_panel;
+        this.mainwin =mainwin;
+        pic_path = this.mainwin.data_class.get_Icon_path();
+        icon_name = this.mainwin.data_class.get_Icon_name();
+        tab_Panel = this.mainwin.draw_panel.tab_draw_panel;
+        
         readImage();
         this.setLayout(new FlowLayout());
         this.setBackground(Color.GRAY);
@@ -30,9 +34,10 @@ public class Toolbox extends JPanel{
     }
     private void readImage(){
         try {
-            entity.setIcon(new ImageIcon(ImageIO.read(new File(pic_path + "entity.png"))));
-            attributes.setIcon(new ImageIcon(ImageIO.read(new File(pic_path + "attributes.png"))));
-            relationship.setIcon(new ImageIcon(ImageIO.read(new File(pic_path + "relationship.png"))));
+            entity.setIcon(new ImageIcon(ImageIO.read(new File(pic_path + icon_name[0]))));
+            attributes.setIcon(new ImageIcon(ImageIO.read(new File(pic_path + icon_name[1]))));
+            relationship.setIcon(new ImageIcon(ImageIO.read(new File(pic_path + icon_name[2]))));
+            // line.setIcon(new ImageIcon(ImageIO.read(new File(pic_path + icon_name[3]))));
         } catch (IOException e) {
             System.out.println("get image fail!");
         }
@@ -42,12 +47,14 @@ public class Toolbox extends JPanel{
         entity.addActionListener(e -> {tab_Panel.toolbox_btn_num = 0;});
         attributes.addActionListener(e -> {tab_Panel.toolbox_btn_num = 1;});
         relationship.addActionListener(e -> {tab_Panel.toolbox_btn_num = 2;});
-        entity.setActionCommand("Entity");
-        attributes.setActionCommand("Attributes");
-        relationship.setActionCommand("Relationship");
-        //
+        line.addActionListener(e -> {tab_Panel.toolbox_btn_num = 3;});
+        // entity.setActionCommand("Entity");
+        // attributes.setActionCommand("Attributes");
+        // relationship.setActionCommand("Relationship");
+        // line.setActionCommand("line");
         this.add(entity);
         this.add(attributes);
         this.add(relationship);
+        this.add(line);
     }
 }

@@ -2,6 +2,7 @@ package core;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Area;
@@ -10,7 +11,7 @@ import javax.swing.JPanel;
 
 public class ObjectType extends JPanel{
     private boolean focus = false;
-    private int object_type, num, size_width = 100,size_heigh=50,location_x, location_y;
+    private int object_type, num, size_width, size_heigh, location_x, location_y;
     private BufferedImage Image;
     ObjectType(BufferedImage bfImg, int type,int num){
         super();
@@ -18,6 +19,8 @@ public class ObjectType extends JPanel{
         this.object_type = type;
         this.setOpaque(false);
         this.Image = bfImg;
+        this.size_width = this.Image.getWidth();
+        this.size_heigh = this.Image.getHeight();
         this.setSize(bfImg.getWidth(), bfImg.getHeight());
         this.setVisible(true);
     }
@@ -67,6 +70,9 @@ public class ObjectType extends JPanel{
     }
     public boolean get_Focus_state(){
         return focus;
+    }
+    public Boolean is_in_graph(Point p){
+        return this.getBounds().contains(p);
     }
     public int get_type(){
         return object_type;

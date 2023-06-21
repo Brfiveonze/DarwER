@@ -16,12 +16,15 @@ import javax.swing.JPanel;
 public class DrawPanel extends JPanel implements MouseListener,MouseMotionListener{
     private data data_string = new data();
     private Point mouse_location = new Point(); 
+    private Boolean connect_2_object = false;
     private int[] object_num = {0,0,0};
     private Tab_Panel parent;
     private String pic_path = data_string.get_Img_path();
     private String[] pic_name = data_string.get_Img_name();
     private ArrayList<ObjectType> object_list = new ArrayList<>();
-    private ObjectType focus_object = null;
+    private ArrayList<ObjectType[]> line_set = new ArrayList<>();
+    private ObjectType[] now_line = new ObjectType[2];
+    private ObjectType last_focus_object = null;
     
     DrawPanel(Tab_Panel parent){
         super();
@@ -37,19 +40,27 @@ public class DrawPanel extends JPanel implements MouseListener,MouseMotionListen
             o.setLocation(x, y);
             object_list.add(o);
             this.add(o);
-            this.revalidate();
-            this.repaint();
+            this.reflash_page();
         } catch (IOException e) {
             System.out.println("Read image is fail");
         }
     }
-    private ObjectType get_focus_object(Point p){
-        ObjectType ot = null;
+    private void reflash_page(){
+        if(!line_set.isEmpty())
+            this.line_set.stream().forEach(o -> {getGraphics().drawLine(o[0].getX(), o[0].getY(), o[1].getX(), o[1].getY());});
+        this.revalidate();
+        this.repaint();
+    }
+    private void clean_object_focus(){
         for(ObjectType i : object_list)
             if(i.get_Focus_state())
                 i.change_Focus();
+    }
+    private ObjectType get_focus_object(Point p){
+        ObjectType ot = null;
+        this.clean_object_focus();
         for(ObjectType i : object_list){
-            if(i.getBounds().contains(p)){
+            if(i.is_in_graph(p)){
                 i.change_Focus();
                 ot = i;
                 break;
@@ -57,28 +68,55 @@ public class DrawPanel extends JPanel implements MouseListener,MouseMotionListen
         }
         return ot;
     }
+    private void chedck_tap_object_and_set_now_tapping_object(ObjectType now_tap_object, int x, int y){
+        if(this.last_focus_object!=null && now_tap_object!=null){
+            if(this.last_focus_object == now_tap_object){
+                System.out.println("focus type: " + this.last_focus_object.get_type() + " number: " + this.last_focus_object.get_num());
+            }
+            else{
+                this.last_focus_object = now_tap_object;
+                System.out.println("tap type: " + this.last_focus_object.get_type() + " number: " + this.last_focus_object.get_num());
+            }
+        }
+        else{
+            this.add_new_graphics(parent.toolbox_btn_num, x, y);
+            this.last_focus_object = now_tap_object;
+        }
+    }
     @Override
     public void mousePressed(MouseEvent e) {
-        this.focus_object = get_focus_object(e.getPoint());
-        if(focus_object!=null)
-            System.out.println(focus_object.get_num());
+        ObjectType now_tap_object = this.get_focus_object(e.getPoint());
+        if(parent.toolbox_btn_num != 3){ //非物件連接模式
+            chedck_tap_object_and_set_now_tapping_object(now_tap_object, e.getX(), e.getY());
+        }
         else{
-            if(parent.toolbox_btn_num < 3)
-                add_new_graphics(parent.toolbox_btn_num,e.getX(), e.getY());
-            else
-                mouse_location.setLocation(e.getX(), e.getY());
+            //
         }
     }
     @Override
     public void mouseDragged(MouseEvent e) {
-        // getGraphics().drawLine((int)mouse_location.getX(), (int)mouse_location.getY(), e.getX(), e.getY());
+        if(this.connect_2_object){
+            this.reflash_page();
+            getGraphics().drawLine((int)mouse_location.getX(), (int)mouse_location.getY(), e.getX(), e.getY());
+        }
     }
     @Override
     public void mouseMoved(MouseEvent e) {
         // System.out.println("new X= " + e.getX() + "Y= " + e.getY());
     }
     @Override
-    public void mouseReleased(MouseEvent e) {}
+    public void mouseReleased(MouseEvent e) {
+        if(this.connect_2_object && now_line[0]!= null){
+            object_list.stream()
+            .filter(i -> i.getBounds().contains(e.getPoint()))
+            .findFirst()
+            .ifPresent(obj -> {
+                now_line[1] = obj;
+            });
+            line_set.add(now_line);
+        }
+        this.reflash_page();
+    }
     @Override
     public void mouseClicked(MouseEvent e) {}
     @Override
