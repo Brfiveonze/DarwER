@@ -41,6 +41,7 @@ public class DrawPanel extends JPanel implements MouseListener,MouseMotionListen
             object_list.add(o);
             this.add(o);
             this.reflash_page();
+            System.out.println("tap type: " + o.get_type() + " number: " + o.get_num());
         } catch (IOException e) {
             System.out.println("Read image is fail");
         }
@@ -69,19 +70,37 @@ public class DrawPanel extends JPanel implements MouseListener,MouseMotionListen
         return ot;
     }
     private void chedck_tap_object_and_set_now_tapping_object(ObjectType now_tap_object, int x, int y){
-        if(this.last_focus_object!=null && now_tap_object!=null){
-            if(this.last_focus_object == now_tap_object){
+        //X0
+        if(null == now_tap_object){
+            this.add_new_graphics(parent.toolbox_btn_num, x, y);
+            this.last_focus_object = now_tap_object;
+        }
+        else{
+            //01
+            if(null == this.last_focus_object)
+                this.last_focus_object = now_tap_object;
+            //11
+            if(this.last_focus_object == now_tap_object)
                 System.out.println("focus type: " + this.last_focus_object.get_type() + " number: " + this.last_focus_object.get_num());
-            }
             else{
                 this.last_focus_object = now_tap_object;
                 System.out.println("tap type: " + this.last_focus_object.get_type() + " number: " + this.last_focus_object.get_num());
             }
         }
-        else{
-            this.add_new_graphics(parent.toolbox_btn_num, x, y);
-            this.last_focus_object = now_tap_object;
-        }
+
+        // if(this.last_focus_object!=null && now_tap_object!=null){
+        //     if(this.last_focus_object == now_tap_object){
+        //         System.out.println("focus type: " + this.last_focus_object.get_type() + " number: " + this.last_focus_object.get_num());
+        //     }
+        //     else{
+        //         this.last_focus_object = now_tap_object;
+        //         System.out.println("tap type: " + this.last_focus_object.get_type() + " number: " + this.last_focus_object.get_num());
+        //     }
+        // }
+        // else{
+        //     this.add_new_graphics(parent.toolbox_btn_num, x, y);
+        //     this.last_focus_object = now_tap_object;
+        // }
     }
     @Override
     public void mousePressed(MouseEvent e) {
