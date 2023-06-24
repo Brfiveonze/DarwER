@@ -12,10 +12,8 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-
 public class DrawPanel extends JPanel implements MouseListener,MouseMotionListener{
     private data data_string = new data();
-    private Point now_mouse_point; 
     private Boolean connect_2_object = false;
     private int[] object_num = {0,0,0};
     private Tab_Panel parent;
@@ -41,7 +39,6 @@ public class DrawPanel extends JPanel implements MouseListener,MouseMotionListen
             o.setLocation(x, y);
             object_list.add(o);
             this.add(o);
-            this.reflash_page();
             System.out.println("tap type: " + o.get_type() + " number: " + o.get_num());
         } catch (IOException e) {
             System.out.println("Read image is fail");
@@ -88,26 +85,40 @@ public class DrawPanel extends JPanel implements MouseListener,MouseMotionListen
         }
     }
     @Override
+    public void paintComponent(Graphics g){
+        super.paintComponent(g);
+        if(!this.line_set.isEmpty())
+            for(ObjectType[] i : line_set)
+                this.getGraphics().drawLine(i[0].getX(), i[0].getY(), i[1].getX(), i[1].getY());
+        reflash_page();
+    }
+    @Override
     public void mousePressed(MouseEvent e) {
         this.now_tap_object = this.get_focus_object(e.getPoint());
         if(parent.toolbox_btn_num != 3){ //非物件連接模式
             this.connect_2_object = false;
             chedck_tap_object_and_set_now_tapping_object(e.getX(), e.getY());
         }
-        else{
-            if(this.now_tap_object != null){
-                this.connect_2_object = true;
+        else{                            //連接物件模式確認第一個點擊物件
+            this.connect_2_object = true;
+            if(this.now_tap_object != null)
                 this.last_focus_object = this.now_tap_object;
-            }
             else
                 this.last_focus_object = null;
         }
     }
     @Override
     public void mouseDragged(MouseEvent e) {
+        if(this.connect_2_object && this.last_focus_object != null){
+            this.getGraphics().drawLine(last_focus_object.getX(), last_focus_object.getY(), e.getX(), e.getY());
+        }
     }
     @Override
     public void mouseReleased(MouseEvent e) {
+        if(this.connect_2_object && this.last_focus_object != null){
+            ObjectType[] line = new ObjectType[]{this.last_focus_object, this.get_focus_object(e.getPoint())};
+            line_set.add(line);
+        }
     }
     @Override
     public void mouseMoved(MouseEvent e) {
