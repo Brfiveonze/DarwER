@@ -44,8 +44,7 @@ public class DrawPanel extends JPanel implements MouseListener,MouseMotionListen
             System.out.println("Read image is fail");
         }
     }
-    private void reflash_page(){
-        this.revalidate();
+    private void clean_line(){
         this.repaint();
     }
     private void clean_object_focus(){
@@ -87,10 +86,10 @@ public class DrawPanel extends JPanel implements MouseListener,MouseMotionListen
     @Override
     public void paintComponent(Graphics g){
         super.paintComponent(g);
+        clean_line();
         if(!this.line_set.isEmpty())
             for(ObjectType[] i : line_set)
-                this.getGraphics().drawLine(i[0].getX(), i[0].getY(), i[1].getX(), i[1].getY());
-        reflash_page();
+                g.drawLine(i[0].getX(), i[0].getY(), i[1].getX(), i[1].getY());
     }
     @Override
     public void mousePressed(MouseEvent e) {
@@ -115,14 +114,14 @@ public class DrawPanel extends JPanel implements MouseListener,MouseMotionListen
     }
     @Override
     public void mouseReleased(MouseEvent e) {
-        if(this.connect_2_object && this.last_focus_object != null){
+        this.now_tap_object = this.get_focus_object(e.getPoint());
+        if(this.connect_2_object && this.last_focus_object != null && this.now_tap_object != null){
             ObjectType[] line = new ObjectType[]{this.last_focus_object, this.get_focus_object(e.getPoint())};
             line_set.add(line);
         }
     }
     @Override
-    public void mouseMoved(MouseEvent e) {
-    }
+    public void mouseMoved(MouseEvent e) {}
     @Override
     public void mouseClicked(MouseEvent e) {}
     @Override
